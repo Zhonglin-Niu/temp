@@ -11,10 +11,10 @@
 -- Drop previous versions of the tables if they they exist, in reverse order of foreign keys.
 DROP TABLE IF EXISTS Game;
 DROP TABLE IF EXISTS Player;
+DROP TABLE IF EXISTS PlayerGame;
 DROP TABLE IF EXISTS PlayerPosition;
 DROP TABLE IF EXISTS Property;
 DROP TABLE IF EXISTS PropertyAsset;
-DROP TABLE IF EXISTS PlayerGame;
 
 -- Create the schema.
 CREATE TABLE Game (
@@ -27,6 +27,14 @@ CREATE TABLE Player (
     ID integer PRIMARY KEY, 
     emailAddress varchar(50) NOT NULL,  -- Player's unique email for identification
     name varchar(50)                    -- Player's display name
+);
+
+CREATE TABLE PlayerGame (
+    gameID integer REFERENCES Game(ID), 
+    playerID integer REFERENCES Player(ID),
+    score integer DEFAULT 0,            -- Current score/net worth
+    cash integer DEFAULT 10000,         -- Current cash amount
+    PRIMARY KEY (gameID, playerID)
 );
 
 CREATE TABLE PlayerPosition (
@@ -58,14 +66,6 @@ CREATE TABLE PropertyAsset (
     PRIMARY KEY (gameID, propertyID)
 );
 
-CREATE TABLE PlayerGame (
-    gameID integer REFERENCES Game(ID), 
-    playerID integer REFERENCES Player(ID),
-    score integer DEFAULT 0,            -- Current score/net worth
-    cash integer DEFAULT 10000,         -- Current cash amount
-    PRIMARY KEY (gameID, playerID)
-);
-
 -- Grant permissions
 GRANT SELECT ON Game TO PUBLIC;
 GRANT SELECT ON Player TO PUBLIC;
@@ -86,6 +86,17 @@ INSERT INTO Player VALUES (2, 'king@gmail.edu', 'The King');
 INSERT INTO Player VALUES (3, 'dog@gmail.edu', 'Dogbreath');
 INSERT INTO Player VALUES (4, 'queen@gmail.edu', 'The Queen');
 INSERT INTO Player VALUES (5, 'lniu@gmail.com', 'Loya');
+
+-- Sample player game records with varying cash amounts and scores
+INSERT INTO PlayerGame VALUES (1, 1, 1500, 5000);    -- Game 1, Player 1
+INSERT INTO PlayerGame VALUES (1, 2, 800, 3000);     -- Game 1, Player 2
+INSERT INTO PlayerGame VALUES (1, 3, 2350, 4200);    -- Game 1, Player 3
+INSERT INTO PlayerGame VALUES (2, 1, 3000, 6000);    -- Game 2, Player 1
+INSERT INTO PlayerGame VALUES (2, 2, 2500, 4800);    -- Game 2, Player 2
+INSERT INTO PlayerGame VALUES (2, 4, 1800, 3500);    -- Game 2, Player 4
+INSERT INTO PlayerGame VALUES (3, 3, 900, 2000);     -- Game 3, Player 3
+INSERT INTO PlayerGame VALUES (3, 4, 1200, 2500);    -- Game 3, Player 4
+INSERT INTO PlayerGame VALUES (3, 5, 1500, 3000);    -- Game 3, Player 5
 
 -- Sample property records (following actual Monopoly board)
 INSERT INTO Property VALUES (1, 'Mediterranean Avenue', 60, 50, 50, 2, 10, 250);
@@ -111,14 +122,3 @@ INSERT INTO PropertyAsset VALUES (1, 3, 3, 0, false);  -- Player 3 owns Reading 
 INSERT INTO PropertyAsset VALUES (2, 1, 4, 3, false);  -- Player 1 owns Oriental with 3 houses
 INSERT INTO PropertyAsset VALUES (2, 2, 5, 4, false);  -- Player 2 owns Vermont with 4 houses
 INSERT INTO PropertyAsset VALUES (2, 4, 6, 0, true);   -- Player 4 owns Connecticut with hotel
-
--- Sample player game records with varying cash amounts and scores
-INSERT INTO PlayerGame VALUES (1, 1, 1500, 5000);    -- Game 1, Player 1
-INSERT INTO PlayerGame VALUES (1, 2, 800, 3000);     -- Game 1, Player 2
-INSERT INTO PlayerGame VALUES (1, 3, 2350, 4200);    -- Game 1, Player 3
-INSERT INTO PlayerGame VALUES (2, 1, 3000, 6000);    -- Game 2, Player 1
-INSERT INTO PlayerGame VALUES (2, 2, 2500, 4800);    -- Game 2, Player 2
-INSERT INTO PlayerGame VALUES (2, 4, 1800, 3500);    -- Game 2, Player 4
-INSERT INTO PlayerGame VALUES (3, 3, 900, 2000);     -- Game 3, Player 3
-INSERT INTO PlayerGame VALUES (3, 4, 1200, 2500);    -- Game 3, Player 4
-INSERT INTO PlayerGame VALUES (3, 5, 1500, 3000);    -- Game 3, Player 5
